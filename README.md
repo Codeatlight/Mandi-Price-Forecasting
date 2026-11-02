@@ -1,8 +1,10 @@
 # Mandi Crop Price Forecasting
 
+![Banner](docs/banner.png)
+
 Forecast wholesale onion, tomato and potato prices across Indian mandis, and warn early when a price spike is likely. These three crops swing sharply in price, which hits farmers and households alike.
 
-> Status: data collected, cleaned and explored, with models tested, forecast ranges added, spike alerts tested and the final test run (steps 1 to 8 done). Results get filled in as the work is done.
+> Status: data collected, cleaned and explored, with models tested, forecast ranges added, spike alerts tested, the final test run and the app built (all 9 steps done). Results get filled in as the work is done.
 
 ## Data
 
@@ -37,7 +39,7 @@ Agmarknet data should be credited as the source wherever it's used. Weather and 
 6. **Validate.** Rolling-origin backtests, never random splits, with error against the baselines at 1, 2 and 4 weeks ahead. Run `python -m src.validate`. See the [validation report](reports/validation.md).
 7. **Uncertainty.** 80% forecast ranges from quantile models, corrected using the previous year's misses, and checked for how often the real price falls inside them. Run `python -m src.intervals`. See the [ranges report](reports/intervals.md).
 8. **Spike alerts.** A spike is a price at least twice the market's median over the previous 52 weeks. The alerts warn of a new spike at a market within four weeks, and are measured on how many spikes were flagged in advance and how many alerts were false, against a rule of thumb and the calendar. Run `python -m src.alerts`. See the [alerts report](reports/alerts.md).
-9. **App.** A Streamlit page: pick a crop and market to see history, the forecast range and any spike warning.
+9. **App.** A Streamlit app: pick a crop and market to see history, the forecast range and any spike warning. `python -m src.export_app` trains on all data and writes `app/market_data.json`, so the app needs neither the raw data nor an API key. Run it with `streamlit run app/streamlit_app.py`.
 
 ## What the data shows
 
@@ -46,6 +48,14 @@ Up to October 2024, a typical four-week move was about 12% for potato, 20% for o
 ![Price history](reports/figures/price_history.png)
 
 ![Seasonal pattern](reports/figures/seasonal_index.png)
+
+## The app
+
+A bazaar-themed Streamlit app with a live rate board, forecasts by crop and market, 80% price ranges and spike status, shown per kg or per quintal. The cart, scale and vendor scenery is drawn in code.
+
+![Home page](docs/home.png)
+
+![Market forecast](docs/forecast.jpg)
 
 ## Project layout
 
@@ -57,6 +67,7 @@ src/               Reusable code: collection, cleaning, features, backtesting
 models/            Saved models (not in git)
 app/               Streamlit app
 reports/figures/   Charts for the README
+docs/              Banner and app screenshots
 ```
 
 ## Setup

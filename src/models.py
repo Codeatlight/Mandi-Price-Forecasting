@@ -89,7 +89,7 @@ def features_for(part, source_state):
     return table_
 
 
-def rolling_forecast(part, features, horizon, drop=(), shuffle=False):
+def rolling_forecast(part, features, horizon, drop=(), shuffle=False, params=PARAMS):
     """Forecasts by target week, retraining before each validation year."""
     logged = np.log(part.ffill(limit=MAX_STALE_WEEKS))
     target = long_form(np.log(part).shift(-horizon) - logged, "target").reindex(features.index)
@@ -104,7 +104,7 @@ def rolling_forecast(part, features, horizon, drop=(), shuffle=False):
         y = target[train].to_numpy()
         if shuffle:
             y = np.random.default_rng(SEED + year).permutation(y)
-        model = lgb.LGBMRegressor(**PARAMS).fit(features.loc[train, columns], y)
+        model = lgb.LGBMRegressor(**params).fit(features.loc[train, columns], y)
         predicted = np.exp(last[score].to_numpy() + model.predict(features.loc[score, columns]))
         index = features.index[score].droplevel(0)
         results.append(pd.DataFrame({"week": target_week[score], "lightgbm": predicted}, index=index))

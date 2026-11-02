@@ -2,7 +2,7 @@
 
 Forecast wholesale onion, tomato and potato prices across Indian mandis, and warn early when a price spike is likely. These three crops swing sharply in price, which hits farmers and households alike.
 
-> Status: data collected, cleaned and explored, with models tested, forecast ranges added and spike alerts tested (steps 1 to 8 done). Results get filled in as the work is done.
+> Status: data collected, cleaned and explored, with models tested, forecast ranges added, spike alerts tested and the final test run (steps 1 to 8 done). Results get filled in as the work is done.
 
 ## Data
 
@@ -69,4 +69,17 @@ pip install -r requirements.txt
 
 ## Results
 
-To be filled in from the backtests.
+Scored once on November 2024 to October 2026, a period kept out of all earlier work. Models were retrained before each test year, with settings fixed in advance. Errors are mean absolute percent error, and lower is better. "Gain" is the error reduction against "next week equals this week", with a 95% range from resampling weeks.
+
+| Crop | Weeks ahead | This week | LightGBM | Gain | Gain range | 80% range held |
+| --- | --- | --- | --- | --- | --- | --- |
+| Onion | 1 | 10.35% | 10.07% | 2.6% | 0.4 to 4.9 | 78.2% |
+| Onion | 4 | 21.41% | 19.91% | 7.0% | -0.1 to 13.2 | 78.2% |
+| Potato | 1 | 5.59% | 5.40% | 3.4% | 0.8 to 5.8 | 81.5% |
+| Potato | 4 | 14.07% | 12.95% | 8.0% | -0.9 to 15.4 | 77.2% |
+| Tomato | 1 | 13.87% | 13.42% | 3.2% | 0.5 to 6.0 | 81.9% |
+| Tomato | 4 | 31.23% | 27.13% | 13.1% | 5.9 to 19.5 | 83.5% |
+
+**Spike alerts** warned of 79% of onion spikes and 85% of tomato spikes in advance. 46% of onion alerts and 17% of tomato alerts came true. Potato had only one spike in the period, so its alerts can't be judged. Full tables are in the [final test report](reports/final_test.md).
+
+Gains are smaller than on validation years, and the onion and potato four-week ranges include zero. The market list was chosen using which markets were still reporting in 2026, so these markets are slightly favoured.

@@ -96,7 +96,7 @@ def calendar_scores(rows, late):
     return scores
 
 
-def caught_beforehand(rows, alert_column, begins):
+def caught_beforehand(rows, alert_column, begins, start, end):
     """Share of scored spike beginnings with an alert in the weeks just before."""
     alerts = rows[rows[alert_column]].reset_index()
     columns = list(alerts.columns[:5])
@@ -104,7 +104,7 @@ def caught_beforehand(rows, alert_column, begins):
     events = long_form(begins, "begin")
     events = events[events.astype(bool)]
     weeks = events.index.get_level_values(0)
-    events = events[(weeks >= pd.Timestamp(FIRST_SCORED_YEAR, 1, 1)) & (weeks < TEST_START)]
+    events = events[(weeks >= start) & (weeks < end)]
     caught, leads = 0, []
     for key in events.index:
         hits = [lead for lead in range(1, WARNING_WEEKS + 1) if (key[0] - pd.Timedelta(weeks=lead), *key[1:]) in marked]
@@ -114,8 +114,8 @@ def caught_beforehand(rows, alert_column, begins):
     return len(events), caught, (float(np.median(leads)) if leads else 0.0)
 
 
-def measure(rows, column, begins, crop):
-    total, caught, lead = caught_beforehand(rows, column, begins)
+def measure(rows, column, begins, crop, start=pd.Timestamp(FIRST_SCORED_YEAR, 1, 1), end=TEST_START):
+    total, caught, lead = caught_beforehand(rows, column, begins, start, end)
     alerts = rows[rows[column]]
     market_years = rows.groupby(rows.index.names[1:]).ngroups * (len(set(rows.index.get_level_values(0).year)))
     return {"crop": crop, "method": column, "alerts": f"{len(alerts):,}",

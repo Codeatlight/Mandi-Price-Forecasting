@@ -27,10 +27,14 @@ MIN_BASE_WEEKS = 26
 KEYS = ["Commodity", "State", "District", "market"]
 
 
-def load_panel():
-    """Weekly prices with one column per series, every week present, before the test period."""
+def load_panel(include_test=False):
+    """Weekly prices with one column per series and every week present.
+
+    Stops before the test period unless the final test asks for it.
+    """
     weekly = pd.read_parquet(WEEKLY)
-    weekly = weekly[weekly["week"] < TEST_START]
+    if not include_test:
+        weekly = weekly[weekly["week"] < TEST_START]
     panel = weekly.pivot_table(index="week", columns=KEYS, values="price")
     return panel.reindex(pd.date_range(panel.index.min(), panel.index.max(), freq="7D"))
 

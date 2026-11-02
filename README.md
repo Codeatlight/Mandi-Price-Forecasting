@@ -2,7 +2,7 @@
 
 Forecast wholesale onion, tomato and potato prices across Indian mandis, and warn early when a price spike is likely. These three crops swing sharply in price, which hits farmers and households alike.
 
-> Status: data collected and cleaned (steps 1 and 2 done). Results get filled in as the work is done.
+> Status: data collected, cleaned and explored (steps 1 to 3 done). Results get filled in as the work is done.
 
 ## Data
 
@@ -31,13 +31,21 @@ Agmarknet data should be credited as the source wherever it's used. Weather and 
 
 1. **Collect.** The busiest 20 districts for each of the three crops, with the source and date of each download recorded in `data/raw/manifest.json`.
 2. **Clean.** Run `python -m src.clean`. Removes duplicates and impossible prices, joins market names across renames, and builds one weekly price per crop and market from 2010. See the [cleaning report](reports/cleaning_report.md).
-3. **Explore.** Seasonality, harvest cycles, how a price move in one mandi spreads to others, and how storable crops differ from perishable ones.
+3. **Explore.** Seasonality, harvest cycles, how a price move in one mandi spreads to others, and how storable crops differ from perishable ones. Run `python -m src.explore`, which uses weeks before November 2024 only. See the [exploration report](reports/exploration.md).
 4. **Baselines first.** "Next week equals this week" and "same week last year". Every model must beat these.
 5. **Models.** SARIMA or ETS per market, then one LightGBM model across all markets, using lagged prices and calendar features.
 6. **Validate.** Rolling-origin backtests, never random splits. Report MAPE and error against the baselines at 1, 2 and 4 weeks ahead.
 7. **Uncertainty.** Prediction intervals with quantile models, checked for how often the real price falls inside them.
-8. **Spike alerts.** Define a spike clearly, then measure how many were flagged in advance, and how many alerts were false.
+8. **Spike alerts.** A spike is a price at least twice the market's median over the previous 52 weeks. Measure how many were flagged in advance, and how many alerts were false.
 9. **App.** A Streamlit page: pick a crop and market to see history, the forecast range and any spike warning.
+
+## What the data shows
+
+Up to October 2024, a typical four-week move was about 12% for potato, 20% for onion and 32% for tomato, so the more perishable the crop, the harder it swings. The final two years stay untouched for testing.
+
+![Price history](reports/figures/price_history.png)
+
+![Seasonal pattern](reports/figures/seasonal_index.png)
 
 ## Project layout
 

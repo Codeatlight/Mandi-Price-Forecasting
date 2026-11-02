@@ -2,32 +2,35 @@
 
 Forecast wholesale onion, tomato and potato prices across Indian mandis, and warn early when a price spike is likely. These three crops swing sharply in price, which hits farmers and households alike.
 
-> Status: data collected (step 1 done). Results get filled in as the work is done.
+> Status: data collected and cleaned (steps 1 and 2 done). Results get filled in as the work is done.
 
 ## Data
 
 Daily minimum, maximum and modal (most common) wholesale prices by market, from the [Variety-wise Daily Market Prices Data of Commodity](https://www.data.gov.in/resource/variety-wise-daily-market-prices-data-commodity) dataset on data.gov.in. It is published by the Directorate of Marketing and Inspection from [Agmarknet](https://agmarknet.gov.in), under the Open Government License India.
 
-Collected so far: the 20 busiest districts for each crop in 2024, with their full histories.
+Collected so far: the 20 busiest districts for each crop in 2024, with their full histories, plus three districts that were later renamed or split.
 
 | Crop | Rows | First record | Last record | Markets (as spelled in the data) |
 | --- | --- | --- | --- | --- |
-| Onion | 559,485 | 2001-03-30 | 2026-10-31 | 420 |
+| Onion | 561,407 | 2001-03-30 | 2026-10-31 | 420+ |
 | Potato | 518,068 | 2001-03-30 | 2026-10-31 | 318 |
-| Tomato | 481,160 | 2002-01-09 | 2026-10-31 | 357 |
+| Tomato | 483,455 | 2002-01-09 | 2026-10-31 | 357+ |
 
 Records are thin before about 2007 and fuller from 2010. This dataset has prices only, with no arrival quantities.
 
 **To get it:** create a free key on data.gov.in and put `DATA_GOV_IN_API_KEY=your_key` in a `.env` file, which stays out of git. Then run `python -m src.collect --rank` and `python -m src.collect`. The data stays out of git too.
 
-**Known problems for step 2:** about 106,000 exact duplicate rows, impossible prices (up to 917,588,483 per quintal, and 299 rows with minimum above maximum), and market names whose spelling changes over time, such as `APMC Chandwad` and `AGRICULTURE PRODUCE MARKET COMITEE CHANDWAD`.
+**What cleaning found:**
+- Market names changed when Agmarknet 2.0 launched in November 2025, and districts such as Ahmednagar (now Ahilyanagar) were renamed or split. These are joined back into one series.
+- Real price spikes survive the cleaning, including tomato in 2023 and onion in 2019.
+- Kerala has no records for any crop at the source since June 2026, so its markets stay useful for backtests but can't have live forecasts. `data/processed/markets.parquet` marks which markets are reporting now.
 
 Agmarknet data should be credited as the source wherever it's used. Weather and arrivals are optional later additions.
 
 ## Plan
 
 1. **Collect.** The busiest 20 districts for each of the three crops, with the source and date of each download recorded in `data/raw/manifest.json`.
-2. **Clean.** Fix unit errors and impossible prices, match spelling differences in market names, and handle holidays and gaps.
+2. **Clean.** Run `python -m src.clean`. Removes duplicates and impossible prices, joins market names across renames, and builds one weekly price per crop and market from 2010. See the [cleaning report](reports/cleaning_report.md).
 3. **Explore.** Seasonality, harvest cycles, how a price move in one mandi spreads to others, and how storable crops differ from perishable ones.
 4. **Baselines first.** "Next week equals this week" and "same week last year". Every model must beat these.
 5. **Models.** SARIMA or ETS per market, then one LightGBM model across all markets, using lagged prices and calendar features.

@@ -38,6 +38,8 @@ PAGE_SIZE = 5000  # as quick to serve as 1,000, while 10,000 takes five times lo
 PAUSE_SECONDS = 1.0
 RETRIES = 6
 TIMEOUT = 90
+# Districts renamed or split at the source. Later rows sit under the new name.
+NEW_DISTRICT_NAMES = {"Ahmednagar": "Ahilyanagar", "Kolar": "Chikkaballapur", "Chittor": "Annamayya"}
 
 
 def api_key():
@@ -109,7 +111,9 @@ def download(key):
     chosen = json.loads(DISTRICTS.read_text(encoding="utf-8"))["districts"]
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8")) if MANIFEST.exists() else {}
     for crop, districts in chosen.items():
-        for row in districts:
+        renamed = [{**row, "District": NEW_DISTRICT_NAMES[row["District"]]} for row in districts
+                   if row["District"] in NEW_DISTRICT_NAMES]
+        for row in districts + renamed:
             path = file_for(crop, row["State"], row["District"])
             if path.as_posix() in manifest and path.exists():
                 continue

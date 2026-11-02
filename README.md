@@ -2,7 +2,7 @@
 
 Forecast wholesale onion, tomato and potato prices across Indian mandis, and warn early when a price spike is likely. These three crops swing sharply in price, which hits farmers and households alike.
 
-> Status: data collected, cleaned and explored, with baselines set (steps 1 to 4 done). Results get filled in as the work is done.
+> Status: data collected, cleaned and explored, with baselines and models tested (steps 1 to 5 done). Results get filled in as the work is done.
 
 ## Data
 
@@ -33,7 +33,7 @@ Agmarknet data should be credited as the source wherever it's used. Weather and 
 2. **Clean.** Run `python -m src.clean`. Removes duplicates and impossible prices, joins market names across renames, and builds one weekly price per crop and market from 2010. See the [cleaning report](reports/cleaning_report.md).
 3. **Explore.** Seasonality, harvest cycles, how a price move in one mandi spreads to others, and how storable crops differ from perishable ones. Run `python -m src.explore`, which uses weeks before November 2024 only. See the [exploration report](reports/exploration.md).
 4. **Baselines first.** "Next week equals this week" and "same week last year". Every model must beat these. Run `python -m src.backtest`. See the [baseline report](reports/baselines.md).
-5. **Models.** SARIMA or ETS per market, then one LightGBM model across all markets, using lagged prices and calendar features.
+5. **Models.** Exponential smoothing, then one LightGBM model per crop and horizon across all markets, using past prices, price moves elsewhere and calendar features, retrained before each validation year. Run `python -m src.models`. See the [model report](reports/models.md).
 6. **Validate.** Rolling-origin backtests, never random splits. Report MAPE and error against the baselines at 1, 2 and 4 weeks ahead.
 7. **Uncertainty.** Prediction intervals with quantile models, checked for how often the real price falls inside them.
 8. **Spike alerts.** A spike is a price at least twice the market's median over the previous 52 weeks. Measure how many were flagged in advance, and how many alerts were false.

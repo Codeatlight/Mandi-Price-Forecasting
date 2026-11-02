@@ -2,7 +2,7 @@
 
 Forecast wholesale onion, tomato and potato prices across Indian mandis, and warn early when a price spike is likely. These three crops swing sharply in price, which hits farmers and households alike.
 
-> Status: data collected, cleaned and explored, with models tested and forecast ranges added (steps 1 to 7 done). Results get filled in as the work is done.
+> Status: data collected, cleaned and explored, with models tested, forecast ranges added and spike alerts tested (steps 1 to 8 done). Results get filled in as the work is done.
 
 ## Data
 
@@ -36,7 +36,7 @@ Agmarknet data should be credited as the source wherever it's used. Weather and 
 5. **Models.** Exponential smoothing, then one LightGBM model per crop and horizon across all markets, using past prices, price moves elsewhere and calendar features, retrained before each validation year. Run `python -m src.models`. See the [model report](reports/models.md).
 6. **Validate.** Rolling-origin backtests, never random splits, with error against the baselines at 1, 2 and 4 weeks ahead. Run `python -m src.validate`. See the [validation report](reports/validation.md).
 7. **Uncertainty.** 80% forecast ranges from quantile models, corrected using the previous year's misses, and checked for how often the real price falls inside them. Run `python -m src.intervals`. See the [ranges report](reports/intervals.md).
-8. **Spike alerts.** A spike is a price at least twice the market's median over the previous 52 weeks. Measure how many were flagged in advance, and how many alerts were false.
+8. **Spike alerts.** A spike is a price at least twice the market's median over the previous 52 weeks. The alerts warn of a new spike at a market within four weeks, and are measured on how many spikes were flagged in advance and how many alerts were false, against a rule of thumb and the calendar. Run `python -m src.alerts`. See the [alerts report](reports/alerts.md).
 9. **App.** A Streamlit page: pick a crop and market to see history, the forecast range and any spike warning.
 
 ## What the data shows

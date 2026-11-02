@@ -2,6 +2,8 @@
 
 ![Banner](docs/banner.png)
 
+**Live app:** https://mandi-price-forecasts.onrender.com
+
 Forecast wholesale onion, tomato and potato prices across Indian mandis, and warn early when a price spike is likely. These three crops swing sharply in price, which hits farmers and households alike.
 
 > Status: data collected, cleaned and explored, with models tested, forecast ranges added, spike alerts tested, the final test run and the app built (all 9 steps done). Results get filled in as the work is done.
